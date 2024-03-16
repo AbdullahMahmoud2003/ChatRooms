@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A website used for chatting about different topics",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node server",
     "dev": "nodemon server"
