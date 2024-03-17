@@ -11,6 +11,10 @@ const socket = io();
 //join room
 socket.emit("joinRoom", {username, room})
 
+socket.on('addUserNames', users => {
+    showAllUsers(users);
+})
+
 //message from server
 socket.on('message', message=>{
     console.log(message);
@@ -41,5 +45,14 @@ function outputMessage(message) {
     ${message['text']}
     </p>`;
     document.querySelector(".chat-messages").appendChild(div);
+}
+
+function showAllUsers(users) {
+    for (var i = 0; i < users.length; i++){
+        const li = document.createElement('li');
+        li.classList.add('user');
+        li.innerHTML = `<li>${users[i].username}</li>`;
+        document.getElementById('users').appendChild(li);
+    }
 }
 
