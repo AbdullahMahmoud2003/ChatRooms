@@ -3,7 +3,7 @@ const http = require('http');
 const express = require('express');
 const socketio = require('socket.io');
 const formatMessage = require('./utils/messages');
-const {userJoin, getCurrentUser, eliminateUser} = require("./utils/users");
+const {userJoin, getCurrentUser, eliminateUser, getAllUsers} = require("./utils/users");
 
 const app = express();
 const server = http.createServer(app);
@@ -19,6 +19,10 @@ io.on('connection', socket => {
     //initializing the room
     socket.on('joinRoom', ({username, room}) => {
         const user = userJoin(socket.id, username, room);
+
+        const roomUsers = getAllUsers(room);
+
+        socket.emit("addUserNames", roomUsers);
 
         socket.join(user.room);
 
@@ -39,8 +43,11 @@ io.on('connection', socket => {
     //Broadcast when a user disconnects
     socket.on('disconnect', () => {
         const removedUser = eliminateUser(socket.id);
+        console.log(removedUser)
 
-        io.to(removedUser.room).emit('message', formatMessage(botName, `${removedUser.username} has left the chat`));
+        if(removedUser) {
+            io.to(removedUser.room).emit('message', formatMessage(botName, `${removedUser.username} has left the chat`));
+        }
     })
 })
 
