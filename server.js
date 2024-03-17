@@ -47,6 +47,9 @@ io.on('connection', socket => {
 
         if(removedUser) {
             io.to(removedUser.room).emit('message', formatMessage(botName, `${removedUser.username} has left the chat`));
+            
+            const roomUsers = getAllUsers(removedUser.room);
+            socket.emit("addUserNames", roomUsers);
         }
     })
 })
