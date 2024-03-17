@@ -1,13 +1,9 @@
-import path from 'path';
-import http from 'http';
-import express from 'express';
-import socketio  from 'socket.io';
-import { formatMessage } from './utils/messages.js';
 const path= require('path');
 const http = require('http');
 const express = require('express');
 const socketio = require('socket.io');
-const formatMessage = require('./utils/messages')
+const formatMessage = require('./utils/messages');
+const {userJoin, getCurrentUser, eliminateUser} = require("./utils/users");
 
 const app = express();
 const server = http.createServer(app);
@@ -20,20 +16,31 @@ const botName = "chatCordBot";
 
 //run when client connects
 io.on('connection', socket => {
-    //Welcome Current user
-    socket.emit('message', formatMessage(botName, "Welcome to ChatCord!"));
+    //initializing the room
+    socket.on('joinRoom', ({username, room}) => {
+        const user = userJoin(socket.id, username, room);
 
-    //Broadcast when a user connects
-    socket.broadcast.emit('message', formatMessage(botName, "A user has joined the chat"));
+        socket.join(user.room);
 
-    //Broadcast when a user disconnects
-    socket.on('disconnect', () => {
-        io.emit('message', formatMessage(botName, "A user has left the chat"));
+        //Welcome Current user
+        socket.emit('message', formatMessage(botName, "Welcome to ChatCord!"));
+
+        //Broadcast when a user connects
+        socket.broadcast.to(user.room).emit('message', formatMessage(botName, `${user.username} has joined the chat`));
     })
 
     //listen to messgaes
     socket.on('chatMessage', (message) => {
-        io.emit('message', formatMessage('USER', message))
+        const user = getCurrentUser(socket.id);
+
+        io.to(user.room).emit('message', formatMessage(`${user.username}`, message));
+    })
+
+    //Broadcast when a user disconnects
+    socket.on('disconnect', () => {
+        const removedUser = eliminateUser(socket.id);
+
+        io.to(removedUser.room).emit('message', formatMessage(botName, `${removedUser.username} has left the chat`));
     })
 })
 

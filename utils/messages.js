@@ -1,6 +1,6 @@
-import moment from "moment";
+const moment = require("moment");
 
-export function formatMessage(username, text) {
+function formatMessage(username, text) {
     return {
         username,
         text,
