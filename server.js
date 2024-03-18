@@ -20,10 +20,6 @@ io.on('connection', socket => {
     socket.on('joinRoom', ({username, room}) => {
         const user = userJoin(socket.id, username, room);
 
-        const roomUsers = getAllUsers(room);
-
-        socket.emit("addUserNames", roomUsers);
-
         socket.join(user.room);
 
         //Welcome Current user
@@ -31,6 +27,12 @@ io.on('connection', socket => {
 
         //Broadcast when a user connects
         socket.broadcast.to(user.room).emit('message', formatMessage(botName, `${user.username} has joined the chat`));
+
+        //send users and room info
+        io.to(user.room).emit('roomUsers', {
+            room: user.room,
+            users: getAllUsers(user.room)
+        })
     })
 
     //listen to messgaes
@@ -50,6 +52,12 @@ io.on('connection', socket => {
             
             const roomUsers = getAllUsers(removedUser.room);
             socket.emit("addUserNames", roomUsers);
+
+            //send users and room info
+            io.to(user.room).emit('roomUsers', {
+                room: user.room,
+                users: getAllUsers(user.room)
+            })
         }
     })
 })

@@ -1,5 +1,7 @@
 const chatForm = document.getElementById("chat-form");
 const chatMessages = document.querySelector(".chat-messages");
+const roomName = document.getElementById('room-name');
+const usersList = document.getElementById('users');
 
 // get username and room from url
 const { username, room } = Qs.parse(location.search, {
@@ -11,7 +13,7 @@ const socket = io();
 //join room
 socket.emit("joinRoom", {username, room})
 
-socket.on('addUserNames', users => {
+socket.on('roomUsers', ({roomname, users}) => {
     showAllUsers(users);
 })
 
@@ -48,11 +50,6 @@ function outputMessage(message) {
 }
 
 function showAllUsers(users) {
-    for (var i = 0; i < users.length; i++){
-        const li = document.createElement('li');
-        li.classList.add('user');
-        li.innerHTML = `<li>${users[i].username}</li>`;
-        document.getElementById('users').appendChild(li);
-    }
+    usersList.innerHTML = `${users.map(user => `<li>${user.username}</li>`).join('')}`;
 }
 
