@@ -21,7 +21,7 @@ io.on('connection', socket => {
         const user = userJoin(socket.id, username, room);
 
         socket.join(user.room);
-
+        
         //Welcome Current user
         socket.emit('message', formatMessage(botName, "Welcome to ChatCord!"));
 
