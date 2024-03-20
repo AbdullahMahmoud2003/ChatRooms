@@ -54,9 +54,9 @@ io.on('connection', socket => {
             socket.emit("addUserNames", roomUsers);
 
             //send users and room info
-            io.to(user.room).emit('roomUsers', {
-                room: user.room,
-                users: getAllUsers(user.room)
+            io.to(removedUser.room).emit('roomUsers', {
+                room: removedUser.room,
+                users: getAllUsers(removedUser.room)
             })
         }
     })
