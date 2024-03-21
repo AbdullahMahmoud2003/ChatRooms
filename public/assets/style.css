@@ -191,4 +191,7 @@ a {
 	.chat-sidebar {
 		display: none;
 	}
+	#msg {
+		height: 50px;
+	}
 }
